@@ -15,7 +15,7 @@ class BannerStorage(S3Storage):
     AWS_ACCESS_KEY_ID = settings.s3_access_key
     AWS_SECRET_ACCESS_KEY = settings.s3_secret_key
     AWS_S3_BUCKET_NAME = settings.s3_bucket
-    AWS_S3_ENDPOINT_URL = settings.s3_endpoint
+    AWS_S3_ENDPOINT_URL = f"{settings.s3_host}:{settings.s3_port}"
     AWS_S3_USE_SSL = settings.s3_secure
     AWS_QUERYSTRING_AUTH = False
     AWS_DEFAULT_ACL = ""
