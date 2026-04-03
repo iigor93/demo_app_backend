@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     s3_bucket: str
     s3_secure: bool
     s3_type: str
+    public_base_url: str | None = None
+
     admin_username: str
     admin_password: str
     admin_secret_key: str
@@ -45,6 +47,13 @@ class Settings(BaseSettings):
     def s3_endpoint(self) -> str:
         protocol = "https" if self.s3_secure else "http"
         return f"{protocol}://{self.s3_host}:{self.s3_port}"
+
+    @computed_field
+    @property
+    def public_s3_base(self) -> str:
+        if self.public_base_url:
+            return self.public_base_url
+        return self.s3_endpoint
 
 
 settings = Settings()
