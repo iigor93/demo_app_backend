@@ -4,7 +4,7 @@ from src.basic.domain.schemas import BannerResponse
 from src.session import BannerControllerDep
 
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1")
 
 
 @router.get("/")
