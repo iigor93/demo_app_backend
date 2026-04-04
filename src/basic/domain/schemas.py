@@ -14,3 +14,16 @@ class BannerResponse(BaseModel):
     name: str | None
     description: str | None
     active: bool
+
+
+class NewsResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    image: str | None
+    position: int
+    name: str | None
+    description: str | None
+    active: bool

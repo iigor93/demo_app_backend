@@ -9,9 +9,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.basic.domain.controller import BannerController
+from src.basic.domain.controller import BannerController, NewsController
 from src.config import settings
-from src.basic.data.repositories import BannerRepository
+from src.basic.data.repositories import BannerRepository, NewsRepository
 
 engine: AsyncEngine = create_async_engine(settings.async_database_url)
 SessionLocal = async_sessionmaker[AsyncSession](
@@ -45,3 +45,21 @@ def banner_controller_factory(
 
 
 BannerControllerDep = Annotated[BannerController, Depends(banner_controller_factory)]
+
+
+def news_repository_factory(
+    db: DBSessionDep,
+) -> NewsRepository:
+    return NewsRepository(db)
+
+
+NewsRepositoryDep = Annotated[NewsRepository, Depends(news_repository_factory)]
+
+
+def news_controller_factory(
+    news_repository: NewsRepositoryDep,
+) -> NewsController:
+    return NewsController(repository=news_repository)
+
+
+NewsControllerDep = Annotated[NewsController, Depends(news_controller_factory)]
