@@ -70,4 +70,6 @@ services:
 
 volumes:
   postgres_data:
+    name: demo_app_postgres_data
   minio_data:
+    name: demo_app_minio_data
