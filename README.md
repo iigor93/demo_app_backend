@@ -1,6 +1,6 @@
 # Demo App Backend
 
-FastAPI backend for working with banners.
+FastAPI backend for working with banners and news.
 
 The project already includes:
 - FastAPI
@@ -14,7 +14,9 @@ The project already includes:
 
 - `GET /` returns `OK`
 - `GET /banners` returns only active banners
+- `GET /news` returns only active news
 - admin panel at `/admin`
+- create and edit banners and news from admin panel
 - image upload to MinIO from admin panel
 - API returns `image` as a public MinIO URL
 
@@ -65,22 +67,22 @@ Main variables:
 
 ```env
 POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+POSTGRES_USER=string
+POSTGRES_PASSWORD=string
 POSTGRES_HOST=localhost
 POSTGRES_DB=demo_app
 
-S3_ACCESS_KEY=minio
-S3_SECRET_KEY=minio123
+S3_ACCESS_KEY=string
+S3_SECRET_KEY=string
 S3_HOST=localhost
 S3_PORT=9000
 S3_BUCKET=demoapp
 S3_SECURE=False
 S3_TYPE=minio
 
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin
-ADMIN_SECRET_KEY=change-me-admin-session-secret
+ADMIN_USERNAME=string
+ADMIN_PASSWORD=string
+ADMIN_SECRET_KEY=string
 ```
 
 ## Local run
@@ -151,6 +153,8 @@ Credentials are read from `.env`:
 Admin panel supports:
 - create banners
 - edit banners
+- create news
+- edit news
 - toggle `active`
 - upload image
 - image preview in list, details and edit pages
@@ -174,6 +178,27 @@ Rules:
 - `active` default is `False`
 - banners are sorted by `position DESC`, then `id DESC`
 - `/banners` returns only active banners
+
+## News model
+
+Current fields:
+- `id`
+- `created_at`
+- `updated_at`
+- `image`
+- `position`
+- `name`
+- `description`
+- `active`
+
+Rules:
+- `image` is optional
+- `position` default is `0`
+- `name` and `description` are optional
+- `active` default is `False`
+- news are sorted by `position DESC`, then `id DESC`
+- `/news` returns only active news
+- `/news` returns at most `10` records
 
 ## Images and MinIO
 
@@ -214,6 +239,7 @@ uv run alembic downgrade -1
 
 - `GET /`
 - `GET /banners`
+- `GET /news`
 - `GET /docs`
 - `GET /admin`
 
