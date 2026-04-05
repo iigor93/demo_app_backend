@@ -28,4 +28,17 @@ async def get_news(
 
 @router.get("/coordinates", response_model=list)
 async def get_coordinates() -> list:
-    return []
+    return [
+        {
+            "lat": 55.7558,
+            "lon": 37.6176,
+            "name": "Красная площадь",
+            "description": "Тестовая точка в центре Москвы.",
+        },
+        {
+            "lat": 55.9167,
+            "lon": 37.8167,
+            "name": "Мытищи",
+            "description": "Тестовая точка в Московской области.",
+        },
+    ]
