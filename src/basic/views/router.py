@@ -24,3 +24,8 @@ async def get_news(
     controller: NewsControllerDep,
 ) -> list[NewsResponse]:
     return await controller.get_news()
+
+
+@router.get("/coordinates", response_model=list)
+async def get_coordinates() -> list:
+    return []
