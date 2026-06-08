@@ -1,8 +1,8 @@
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.basic.data.models import Banner, News
-from src.basic.domain.schemas import BannerResponse, NewsResponse
+from src.basic.data.models import Banner, News, WorkoutConfig
+from src.basic.domain.schemas import BannerResponse, NewsResponse, WorkoutsResponse
 
 
 class BannerRepository:
@@ -36,3 +36,21 @@ class NewsRepository:
         result = await self.session.execute(statement)
         news = result.scalars().all()
         return [NewsResponse.model_validate(item) for item in news]
+
+
+class WorkoutRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def get_workouts(self) -> WorkoutsResponse:
+        statement = (
+            select(WorkoutConfig)
+            .where(WorkoutConfig.active.is_(True))
+            .order_by(desc(WorkoutConfig.updated_at), desc(WorkoutConfig.id))
+            .limit(1)
+        )
+        result = await self.session.execute(statement)
+        config = result.scalar_one_or_none()
+        if config is None:
+            return WorkoutsResponse(workouts=[])
+        return WorkoutsResponse.model_validate(config.data)

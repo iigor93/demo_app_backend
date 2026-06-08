@@ -1,10 +1,14 @@
-from markupsafe import Markup
+import json
+
+from markupsafe import Markup, escape
+from pydantic import ValidationError
 from sqladmin import Admin, ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, Response
 
-from src.basic.data.models import Banner, News
+from src.basic.data.models import Banner, News, WorkoutConfig
+from src.basic.domain.schemas import WorkoutsResponse
 from src.config import settings
 from src.session import engine
 
@@ -177,6 +181,71 @@ class NewsAdmin(ModelView, model=News):
     }
 
 
+class WorkoutConfigAdmin(ModelView, model=WorkoutConfig):
+    name = "Workout config"
+    name_plural = "Workout configs"
+    icon = "fa-solid fa-dumbbell"
+
+    column_list = [
+        WorkoutConfig.id,
+        WorkoutConfig.active,
+        WorkoutConfig.updated_at,
+        WorkoutConfig.created_at,
+    ]
+    column_sortable_list = [
+        WorkoutConfig.id,
+        WorkoutConfig.active,
+        WorkoutConfig.created_at,
+        WorkoutConfig.updated_at,
+    ]
+    column_details_list = [
+        WorkoutConfig.id,
+        WorkoutConfig.data,
+        WorkoutConfig.active,
+        WorkoutConfig.created_at,
+        WorkoutConfig.updated_at,
+    ]
+    column_default_sort = [(WorkoutConfig.updated_at, True), (WorkoutConfig.id, True)]
+    form_columns = [
+        WorkoutConfig.data,
+        WorkoutConfig.active,
+    ]
+    form_widget_args = {
+        "data": {
+            "rows": 24,
+            "style": "font-family: monospace; min-height: 480px;",
+        }
+    }
+    column_formatters_detail = {
+        WorkoutConfig.data: lambda model, attribute: Markup(
+            "<pre "
+            'style="white-space: pre-wrap; font-family: monospace; '
+            'border: 1px solid #d9e2ec; border-radius: 8px; '
+            'padding: 12px; background: #fff;">'
+            f"{escape(json.dumps(model.data, ensure_ascii=False, indent=2))}"
+            "</pre>"
+        )
+    }
+
+    async def on_model_change(
+        self,
+        data: dict,
+        model: WorkoutConfig,
+        is_created: bool,
+        request: Request,
+    ) -> None:
+        try:
+            validated_data = WorkoutsResponse.model_validate(data["data"])
+        except ValidationError as exc:
+            errors = "; ".join(
+                f"{'.'.join(str(part) for part in error['loc'])}: {error['msg']}"
+                for error in exc.errors()
+            )
+            raise ValueError(f"Invalid workouts JSON structure: {errors}") from exc
+
+        data["data"] = validated_data.model_dump()
+
+
 def setup_admin(app) -> Admin:
     authentication_backend = AdminAuth(secret_key=settings.admin_secret_key)
     admin = Admin(
@@ -186,4 +255,5 @@ def setup_admin(app) -> Admin:
     )
     admin.add_view(BannerAdmin)
     admin.add_view(NewsAdmin)
+    admin.add_view(WorkoutConfigAdmin)
     return admin

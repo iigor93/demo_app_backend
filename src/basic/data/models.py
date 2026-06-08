@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Integer, String, Text, func, text
+from sqlalchemy import Boolean, DateTime, Integer, JSON, String, Text, func, text
 from fastapi_storages.integrations.sqlalchemy import FileType
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -75,4 +75,28 @@ class News(Base):
         nullable=False,
         default=False,
         server_default=text("false"),
+    )
+
+
+class WorkoutConfig(Base):
+    __tablename__ = "workout_configs"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+    data: Mapped[dict] = mapped_column(JSON, nullable=False)
+    active: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default=text("true"),
     )

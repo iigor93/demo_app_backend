@@ -9,9 +9,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.basic.domain.controller import BannerController, NewsController
+from src.basic.domain.controller import BannerController, NewsController, WorkoutController
 from src.config import settings
-from src.basic.data.repositories import BannerRepository, NewsRepository
+from src.basic.data.repositories import BannerRepository, NewsRepository, WorkoutRepository
 
 engine: AsyncEngine = create_async_engine(settings.async_database_url)
 SessionLocal = async_sessionmaker[AsyncSession](
@@ -63,3 +63,27 @@ def news_controller_factory(
 
 
 NewsControllerDep = Annotated[NewsController, Depends(news_controller_factory)]
+
+
+def workout_repository_factory(
+    db: DBSessionDep,
+) -> WorkoutRepository:
+    return WorkoutRepository(db)
+
+
+WorkoutRepositoryDep = Annotated[
+    WorkoutRepository,
+    Depends(workout_repository_factory),
+]
+
+
+def workout_controller_factory(
+    workout_repository: WorkoutRepositoryDep,
+) -> WorkoutController:
+    return WorkoutController(repository=workout_repository)
+
+
+WorkoutControllerDep = Annotated[
+    WorkoutController,
+    Depends(workout_controller_factory),
+]

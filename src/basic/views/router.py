@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from src.basic.domain.schemas import BannerResponse, NewsResponse
-from src.session import BannerControllerDep, NewsControllerDep
+from src.basic.domain.schemas import BannerResponse, NewsResponse, WorkoutsResponse
+from src.session import BannerControllerDep, NewsControllerDep, WorkoutControllerDep
 
 
 router = APIRouter(prefix="/api/v1")
@@ -24,6 +24,13 @@ async def get_news(
     controller: NewsControllerDep,
 ) -> list[NewsResponse]:
     return await controller.get_news()
+
+
+@router.get("/workouts", response_model=WorkoutsResponse)
+async def get_workouts(
+    controller: WorkoutControllerDep,
+) -> WorkoutsResponse:
+    return await controller.get_workouts()
 
 
 @router.get("/coordinates", response_model=list)
